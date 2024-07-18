@@ -1,0 +1,24 @@
+{
+  "name": "apricity",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -cw"
+  },
+  "author": "apricity",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "buffer": "^6.0.3",
+    "rollup-plugin-babel": "^4.4.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.24.8",
+    "@babel/core": "^7.24.9",
+    "@babel/preset-env": "^7.24.8",
+    "rollup-plugin-polyfill-node": "^0.13.0"
+  }
+}
