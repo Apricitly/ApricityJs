@@ -1,6 +1,6 @@
 这是一个前端发送请求的js库
 =======
-# Apricity --前后端交互工具库
+# ApricityJs --前后端交互工具库
 
 <font color=blue>这是本人在学习 js 的过程中编写的一个工具库用来熟悉 js 的，一切仅供本人学习使用</font>
 
@@ -13,7 +13,7 @@
 - **语言：**`javaScript`
 - **第三方库：**`buffer`
 - **环境：**`Nodejs`
-- **打包工具：**`rollup` + `babel`
+- **打包工具：**`rollup`
 - **基础依赖：**`http`
 
 ## 三、功能实现
@@ -42,10 +42,10 @@
           },
         },
         () => {
-          console.log("请求发送前执行回调函数");
+          console.log("请求发送前执行函数");
         },
         () => {
-          console.log("请求完成后执行回调函数");
+          console.log("请求完成后执行函数");
         }
       )
         .then((res) => {
@@ -72,10 +72,10 @@
         { "Content-Type": "application/json" },
         { user: "admin", password: "admin" },
         () => {
-          console.log("请求发送前执行的回调函数");
+          console.log("请求发送前执行的函数");
         },
         () => {
-          console.log("请求完成后执行的回调函数");
+          console.log("请求完成后执行的函数");
         }
       )
         .then((res) => {
@@ -107,10 +107,10 @@
         headers: { "Content-Type": "application/json" },
         timeout: 10000,
         headerBeforeRequest: () => {
-          console.log("请求发送前执行的回调函数");
+          console.log("请求发送前执行的函数");
         },
         headerAfterRequest: () => {
-          console.log("请求完成后执行的回调函数");
+          console.log("请求完成后执行的函数");
         },
       });
       ```
@@ -123,10 +123,10 @@
         config.headers = { "Content-Type": "application/json" };
         config.timeout = 10000;
         config.headerBeforeRequest = () => {
-          console.log("请求发送前执行的回调函数");
+          console.log("请求发送前执行的函数");
         };
         config.headerAfterRequest = () => {
-          console.log("请求完成后执行的回调函数");
+          console.log("请求完成后执行的函数");
         };
       
         return config;
@@ -141,10 +141,10 @@
      config.headers = { "Content-Type": "application/json" };
      config.timeout = 10000;
      config.headerBeforeRequest = () => {
-       console.log("请求发送前执行的回调函数");
+       console.log("请求发送前执行的函数");
      };
      config.headerAfterRequest = () => {
-       console.log("请求完成后执行的回调函数");
+       console.log("请求完成后执行的函数");
      };
    
      return config;
@@ -164,7 +164,4 @@
 
 这个前后端交互工具库，目前仅适合再项目中做测试使用，由于该库还不具备完全的生产环境的处理功能以及许多基础功能未实现，所以只能做测试使用。
 
-**新特点：**
-
 - 基础配置绑定在实例上，可以直接通过实例进行修改。
-- 有执行的回调函数（**请求发送前**和**请求发送后**）
