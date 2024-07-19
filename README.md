@@ -159,6 +159,30 @@
    ```
 
    在基础配置中配置的参数，在后续是可以进行修改的以防一整个系统中出现不同情况的应对。例如：出现一个或者多个不同基础 url 的访问（只改变 url 不改变其他的配置）。这时就不用再单独进行配置，或者重新写请求的方法。emmm...，这只是一个例子，仅用于做例子，实际可能不会出现这种情况，所以这只是一个例子。
+   
+   **配置拦截：**
+   
+   * ```javascript
+     const ap = new Apricity((config) => {
+       config.baseUrl = "http://localhost:3000";
+       config.headers = { "Content-Type": "application/json" };
+       config.timeout = 10000;
+       config.headerBeforeRequest = () => {
+         console.log("请求发送前执行的函数");
+       };
+       config.headerAfterRequest = () => {
+         console.log("请求完成后执行的函数");
+       };
+     
+       return config;
+     });
+     
+     ap.get("url", {}, (config)=>{
+         config.baseUrl = "http://localhost:4000"
+     })
+     ```
+   
+   * 如果在基础配置中配置了参数，那么在`get`和`post`请求的`beforeRequest`参数中会接收到一个config参数，这里可以在请求发送前对请求的配置做一次拦截
 
 ## 总结：
 

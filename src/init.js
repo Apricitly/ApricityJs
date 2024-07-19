@@ -4,6 +4,28 @@ import { generateOptions } from "./parse/generation.js";
 import { sendGetHttp, sendPostHttp } from "./http/index.js";
 import { defineProxy } from "./proxy/index.js";
 
+function _genericFun(method, url, data, config, params, Apricity) {
+  if (method === "get") {
+    const fixedUrl = handleGetUrl(url, data.params, Apricity);
+    const handledUrl = new URL(fixedUrl);
+    return generateOptions(handledUrl, method, data.config, Apricity);
+  } else if (method === "post") {
+    const fixedUrl = handlePostUrl(url, Apricity);
+    const handleUrl = new URL(fixedUrl);
+    return generateOptions(handleUrl, method, { config, params }, Apricity);
+  }
+}
+
+function beforeRequestConfig(config, fun) {
+  if (fun && typeof fun === "function") {
+    if (config) {
+      fun(config);
+    } else {
+      fun();
+    }
+  }
+}
+
 /**
  *初始化Apricity
  * @param {Function} Apricity
@@ -14,23 +36,13 @@ export function initMixin(Apricity) {
   /**
    * 通用函数
    */
-  function _genericFun(method, url, data, config, params, Apricity) {
-    if (method === "get") {
-      const fixedUrl = handleGetUrl(url, data.params, Apricity);
-      const handledUrl = new URL(fixedUrl);
-      return generateOptions(handledUrl, method, data.config, Apricity);
-    } else if (method === "post") {
-      const fixedUrl = handlePostUrl(url, Apricity);
-      const handleUrl = new URL(fixedUrl);
-      return generateOptions(handleUrl, method, { config, params }, Apricity);
-    }
-  }
 
   Apricity.prototype.get = function (url, data, beforeRequest, afterRequest) {
-    const options = _genericFun("get", url, data, null, null, this);
+    beforeRequestConfig(this.config, beforeRequest);
 
+    const options = _genericFun("get", url, data, null, null, this);
     return new Promise((resolve, reject) => {
-      sendGetHttp(options, resolve, reject, beforeRequest, afterRequest, this);
+      sendGetHttp(options, resolve, reject, afterRequest, this);
     });
   };
 
@@ -41,17 +53,12 @@ export function initMixin(Apricity) {
     beforeRequest,
     afterRequest
   ) {
+    beforeRequestConfig(this.config, beforeRequest);
     const options = _genericFun("post", url, null, config, params, this);
+
+    console.log(options);
     return new Promise((resolve, reject) => {
-      sendPostHttp(
-        options,
-        resolve,
-        reject,
-        beforeRequest,
-        afterRequest,
-        params,
-        this
-      );
+      sendPostHttp(options, resolve, reject, afterRequest, params, this);
     });
   };
 
