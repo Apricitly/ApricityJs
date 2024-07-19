@@ -56,7 +56,6 @@ export function initMixin(Apricity) {
     beforeRequestConfig(this.config, beforeRequest);
     const options = _genericFun("post", url, null, config, params, this);
 
-    console.log(options);
     return new Promise((resolve, reject) => {
       sendPostHttp(options, resolve, reject, afterRequest, params, this);
     });
