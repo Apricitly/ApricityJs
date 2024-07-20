@@ -4,6 +4,9 @@ import { generateOptions } from "./parse/generation.js";
 import { sendGetHttp, sendPostHttp } from "./http/index.js";
 import { defineProxy } from "./proxy/index.js";
 
+/**
+ * 通用函数
+ */
 function _genericFun(method, url, data, config, params, Apricity) {
   if (method === "get") {
     const fixedUrl = handleGetUrl(url, data.params, Apricity);
@@ -16,7 +19,7 @@ function _genericFun(method, url, data, config, params, Apricity) {
   }
 }
 
-function beforeRequestConfig(config, fun) {
+function beforeRequestConfig(fun, config) {
   if (fun && typeof fun === "function") {
     if (config) {
       fun(config);
@@ -33,12 +36,8 @@ function beforeRequestConfig(config, fun) {
 export function initMixin(Apricity) {
   if (!Apricity) return;
 
-  /**
-   * 通用函数
-   */
-
   Apricity.prototype.get = function (url, data, beforeRequest, afterRequest) {
-    beforeRequestConfig(this.config, beforeRequest);
+    beforeRequestConfig(beforeRequest, this.config);
 
     const options = _genericFun("get", url, data, null, null, this);
     return new Promise((resolve, reject) => {
@@ -53,9 +52,9 @@ export function initMixin(Apricity) {
     beforeRequest,
     afterRequest
   ) {
-    beforeRequestConfig(this.config, beforeRequest);
-    const options = _genericFun("post", url, null, config, params, this);
+    beforeRequestConfig(beforeRequest, this.config);
 
+    const options = _genericFun("post", url, null, config, params, this);
     return new Promise((resolve, reject) => {
       sendPostHttp(options, resolve, reject, afterRequest, params, this);
     });
