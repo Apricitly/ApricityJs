@@ -12,7 +12,7 @@
 
 - **语言：**`javaScript`
 - **第三方库：**`buffer`
-- **环境：**`Nodejs`
+- **环境：**`Node.js`
 - **打包工具：**`rollup`
 - **基础依赖：**`http`
 
