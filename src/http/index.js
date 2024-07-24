@@ -4,9 +4,6 @@ import { parseData } from "../parse/parseData.js";
 export function sendGetHttp(options, resolve, reject, afterRequest, Apricity) {
   const _fun = Apricity;
 
-  if (_fun.config && _fun.config.headerBeforeRequest)
-    _fun.config.headerBeforeRequest();
-
   const req = http.request(options, (res) => {
     let resquest;
 
@@ -33,8 +30,6 @@ export function sendGetHttp(options, resolve, reject, afterRequest, Apricity) {
   req.on("error", (error) => reject(error));
   req.end();
 
-  if (_fun.config && _fun.config.headerAfterRequest)
-    _fun.config.headerAfterRequest();
   if (afterRequest && typeof afterRequest === "function") afterRequest();
 }
 
@@ -47,9 +42,6 @@ export function sendPostHttp(
   Apricity
 ) {
   const _fun = Apricity;
-
-  if (_fun.config && _fun.config.headerBeforeRequest)
-    _fun.config.headerBeforeRequest();
 
   const req = http.request(options, (res) => {
     let resquest;
@@ -80,7 +72,5 @@ export function sendPostHttp(
   req.on("error", (error) => reject(error));
   req.end();
 
-  if (_fun.config && _fun.config.headerAfterRequest)
-    _fun.config.headerAfterRequest();
   if (afterRequest && typeof afterRequest === "function") afterRequest();
 }

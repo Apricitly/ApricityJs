@@ -19,13 +19,15 @@ function _genericFun(method, url, data, config, params, Apricity) {
   }
 }
 
-function beforeRequestConfig(fun, config) {
-  if (fun && typeof fun === "function") {
-    if (config) {
-      fun(config);
-    } else {
-      fun();
-    }
+function beforeRequestConfig(fun, config, params) {
+  if (!fun && typeof fun !== "function") {
+    return;
+  }
+
+  if (config) {
+    fun(config, params);
+  } else {
+    fun(params);
   }
 }
 
@@ -37,7 +39,7 @@ export function initMixin(Apricity) {
   if (!Apricity) return;
 
   Apricity.prototype.get = function (url, data, beforeRequest, afterRequest) {
-    beforeRequestConfig(beforeRequest, this.config);
+    beforeRequestConfig(beforeRequest, this.config, data);
 
     const options = _genericFun("get", url, data, null, null, this);
     return new Promise((resolve, reject) => {
@@ -52,7 +54,7 @@ export function initMixin(Apricity) {
     beforeRequest,
     afterRequest
   ) {
-    beforeRequestConfig(beforeRequest, this.config);
+    beforeRequestConfig(beforeRequest, this.config, { config, params });
 
     const options = _genericFun("post", url, null, config, params, this);
     return new Promise((resolve, reject) => {
