@@ -177,7 +177,7 @@
                params: { username: "aaa" },
              },
              (baseConfig, {config, params}) => {
-               data.params.username = "bbb";
+               params.username = "bbb";
              }
            ).then((res) => console.log(res));
      ```
