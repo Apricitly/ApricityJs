@@ -207,7 +207,7 @@
                params: { username: "aaa" },
              },
              ({config, params}) => {
-               data.params.username = "bbb";
+               params.username = "bbb";
              }
            ).then((res) => console.log(res));
      
