@@ -231,9 +231,26 @@
   简单的调用对应的请求方法
 
   ```javascript
-  const name = "jack";
+  const ap = new Apricity((config) => {
+      config.baseUrl = "http://localhost:3000";
+      config.headers = { "Content-Type": "application/json" };
+      config.timeout = 3000;
+  
+      return config;
+  }).custom();
+  
+  async function test() {
+      const res = await ap({
+          method: "get",
+          url: "/array",
+      });
+  
+      console.log(res);
+  }
+  
+  test();
   ```
-
+  
   > 可以用来封装函数，简单的调用对应的请求
   
 
