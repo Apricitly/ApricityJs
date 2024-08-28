@@ -42,6 +42,7 @@ export function initMixin(Apricity) {
     beforeRequestConfig(beforeRequest, this.config, data);
 
     const options = _genericFun("get", url, data, null, null, this);
+
     return new Promise((resolve, reject) => {
       sendGetHttp(options, resolve, reject, afterRequest, this);
     });
@@ -72,5 +73,61 @@ export function initMixin(Apricity) {
 
     const proxyConfig = this.config;
     for (const key in proxyConfig) defineProxy(this, "config", key);
+  };
+
+  Apricity.prototype.custom = function () {
+    const _this = this;
+    function getKV(config) {
+      let data;
+      let beforeRequest;
+      let afterRequest;
+      let configs;
+      let params;
+
+      for (const key in config) {
+        switch (key) {
+          case "data":
+            data = config.data;
+            break;
+          case "beforeRequest":
+            beforeRequest = config.beforeRequest;
+            break;
+          case "afterRequest":
+            afterRequest = config.afterRequest;
+            break;
+          case "configs":
+            configs = config.configs;
+            break;
+          case "params":
+            params = config.params;
+            break;
+          default:
+            break;
+        }
+      }
+
+      return { data, beforeRequest, afterRequest, configs, params };
+    }
+
+    return function (config) {
+      const { method, url } = config;
+      if (!method || !url) throw new Error(`method or url is allowed`);
+
+      if (method === "get") {
+        const { data, beforeRequest, afterRequest, configs } = getKV(config);
+        return _this.get(
+          url,
+          { params: data, config: configs },
+          beforeRequest,
+          afterRequest
+        );
+      }
+
+      if (method === "post") {
+        const { beforeRequest, afterRequest, configs, params } = getKV(config);
+
+        return this.post(url, configs, params, beforeRequest, afterRequest);
+      }
+    };
   };
 }

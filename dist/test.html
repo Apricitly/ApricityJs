@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="app"></div>
+    <script src="./Apricity.js"></script>
+    <script>
+      const ap = new Apricity((config) => {
+        config.baseUrl = "http://localhost:3000";
+        config.headers = { "Content-Type": "application/json" };
+        config.timeout = 3000;
+
+        return config;
+      }).custom();
+
+      async function test() {
+        const res = await ap({
+          method: "get",
+          url: "/array",
+        });
+
+        console.log(res);
+      }
+
+      test();
+      // ap.post(
+      //   "/objectPost",
+      //   {},
+      //   { user: "admin", password: "admin" },
+      //   (baseConfig, { config, params }) => {
+      //     params.user = "user";
+      //     params.password = "user";
+      //   }
+      // )
+      //   .then((res) => {
+      //     app.textContent = `post参数: user=${res.user}, password=${res.password}`;
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
+    </script>
+  </body>
+</html>

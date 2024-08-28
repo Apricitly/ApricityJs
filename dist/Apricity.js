@@ -7051,18 +7051,52 @@
     if (stringData.startsWith("{") || stringData.startsWith("[")) return JSON.parse(stringData);else return stringData;
   }
 
+  var result = {
+    code: 0,
+    data: null,
+    methods: "",
+    message: "",
+    url: "",
+    isTimeOut: null,
+    isCancel: null,
+    isRedirect: null
+  };
+  function sendSuccessResult(request, options, res) {
+    result.code = 200;
+    result.data = parseData(request);
+    result.methods = options.method;
+    result.message = res.statusMessage;
+    result.url = options.url;
+    result.isTimeOut = false;
+    result.isCancel = false;
+    result.isRedirect = res.statusCode >= 300 && res.statusCode < 400;
+    return result;
+  }
+  function sendErrorResult(error, options) {
+    result.code = 500;
+    result.data = null;
+    result.methods = options.method;
+    result.message = error.message;
+    result.url = options.url;
+    result.isTimeOut = error.code === "ETIMEDOUT";
+    result.isCancel = error.code === "ECONNABORTED";
+    result.isRedirect = false;
+    return result;
+  }
   function sendGetHttp(options, resolve, reject, afterRequest, Apricity) {
     var _fun = Apricity;
     var req = http.request(options, function (res) {
-      var resquest;
+      var request;
       res.on("data", function (chunk) {
-        resquest = chunk;
+        request = chunk;
       });
       res.on("end", function () {
         try {
-          resolve(parseData(resquest));
+          var resultSuccess = sendSuccessResult(request, options, res);
+          resolve(resultSuccess);
         } catch (error) {
-          reject(error);
+          var resultError = sendErrorResult(error, options);
+          reject(resultError);
         }
       });
     });
@@ -7074,7 +7108,8 @@
       }, Apricity.config.timeout);
     }
     req.on("error", function (error) {
-      return reject(error);
+      var resultError = sendErrorResult(error, options);
+      reject(resultError);
     });
     req.end();
     if (afterRequest && typeof afterRequest === "function") afterRequest();
@@ -7082,15 +7117,17 @@
   function sendPostHttp(options, resolve, reject, afterRequest, params, Apricity) {
     var _fun = Apricity;
     var req = http.request(options, function (res) {
-      var resquest;
+      var request;
       res.on("data", function (chunk) {
-        resquest = chunk;
+        request = chunk;
       });
       res.on("end", function () {
         try {
-          resolve(parseData(resquest));
+          var resultSuccess = sendSuccessResult(request, options, res);
+          resolve(resultSuccess);
         } catch (error) {
-          reject(error);
+          var resultError = sendErrorResult(error, options);
+          reject(resultError);
         }
       });
     });
@@ -7103,7 +7140,8 @@
       }, _fun.config.timeout);
     }
     req.on("error", function (error) {
-      return reject(error);
+      var resultError = sendErrorResult(error, options);
+      reject(resultError);
     });
     req.end();
     if (afterRequest && typeof afterRequest === "function") afterRequest();
@@ -7160,22 +7198,22 @@
   function initMixin(Apricity) {
     if (!Apricity) return;
     Apricity.prototype.get = function (url, data, beforeRequest, afterRequest) {
-      var _this = this;
+      var _this2 = this;
       beforeRequestConfig(beforeRequest, this.config, data);
       var options = _genericFun("get", url, data, null, null, this);
       return new Promise(function (resolve, reject) {
-        sendGetHttp(options, resolve, reject, afterRequest, _this);
+        sendGetHttp(options, resolve, reject, afterRequest, _this2);
       });
     };
     Apricity.prototype.post = function (url, config, params, beforeRequest, afterRequest) {
-      var _this2 = this;
+      var _this3 = this;
       beforeRequestConfig(beforeRequest, this.config, {
         config: config,
         params: params
       });
       var options = _genericFun("post", url, null, config, params, this);
       return new Promise(function (resolve, reject) {
-        sendPostHttp(options, resolve, reject, afterRequest, params, _this2);
+        sendPostHttp(options, resolve, reject, afterRequest, params, _this3);
       });
     };
     Apricity.prototype._init = function (config) {
@@ -7188,6 +7226,66 @@
       var proxyConfig = this.config;
       for (var key in proxyConfig) defineProxy(this, "config", key);
     };
+    Apricity.prototype.custom = function () {
+      var _this = this;
+      function getKV(config) {
+        var data;
+        var beforeRequest;
+        var afterRequest;
+        var configs;
+        var params;
+        for (var key in config) {
+          switch (key) {
+            case "data":
+              data = config.data;
+              break;
+            case "beforeRequest":
+              beforeRequest = config.beforeRequest;
+              break;
+            case "afterRequest":
+              afterRequest = config.afterRequest;
+              break;
+            case "configs":
+              configs = config.configs;
+              break;
+            case "params":
+              params = config.params;
+              break;
+          }
+        }
+        return {
+          data: data,
+          beforeRequest: beforeRequest,
+          afterRequest: afterRequest,
+          configs: configs,
+          params: params
+        };
+      }
+      return function (config) {
+        var method = config.method,
+          url = config.url;
+        if (!method || !url) throw new Error("method or url is allowed");
+        if (method === "get") {
+          var _getKV = getKV(config),
+            data = _getKV.data,
+            beforeRequest = _getKV.beforeRequest,
+            afterRequest = _getKV.afterRequest,
+            configs = _getKV.configs;
+          return _this.get(url, {
+            params: data,
+            config: configs
+          }, beforeRequest, afterRequest);
+        }
+        if (method === "post") {
+          var _getKV2 = getKV(config),
+            _beforeRequest = _getKV2.beforeRequest,
+            _afterRequest = _getKV2.afterRequest,
+            _configs = _getKV2.configs,
+            params = _getKV2.params;
+          return this.post(url, _configs, params, _beforeRequest, _afterRequest);
+        }
+      };
+    };
   }
 
   function Apricity(config) {
@@ -7195,7 +7293,8 @@
       var setFunOptions = {
         baseUrl: "",
         timeout: 10000,
-        headers: {}
+        headers: {},
+        redirect: undefined
       };
       var setedFunOptions = config(setFunOptions);
       this._init(setedFunOptions);

@@ -7,6 +7,7 @@ function Apricity(config) {
       baseUrl: "",
       timeout: 10000,
       headers: {},
+      redirect: undefined,
     };
     const setedFunOptions = config(setFunOptions);
     this._init(setedFunOptions);
